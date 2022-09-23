@@ -107,7 +107,8 @@ class MoleculeInput:
     
     # definisci il path per istsimilarity
     
-    path_program = "CustomFeaturesCLI/CustomFeaturesCLI.jar" #work
+    path_program = os.getcwd()
+    path_program = f"{path_program}/CustomFeaturesCLI/CustomFeaturesCLI.jar" 
 
 
     def __init__(self, smile, simili):
