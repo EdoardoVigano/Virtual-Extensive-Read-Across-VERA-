@@ -1334,7 +1334,10 @@ def remove_Redundant(a:Chem.rdchem.Mol, b:pd.DataFrame): #dove b è grp_rdkit_ta
 
     #if b.keys().any() in list_out: 
     b.drop(list_out, axis=1, inplace=True)
-    return b.clip(lower=0)
+    num = b._get_numeric_data()
+    num[num < 0] = 0
+    
+    return b 
         
 
 def cassification(a): 
