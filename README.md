@@ -17,22 +17,23 @@ Viganò, E.L.; Colombo, E.; Raitano, G.; Manganaro, A.; Sommovigo, A.; Dorne, J.
 - Open the Anaconda Prompt (anaconda3).
 - Create and activate a new RDKit Python environment (my-rdkit-env) with the following commands:
         
-        conda create -c https://conda.anaconda.org/rdkit -n my-rdkit-env rdkit
-        conda activate my-rdkit-env
+       > conda create -c https://conda.anaconda.org/rdkit -n my-rdkit-env rdkit
+       > conda activate my-rdkit-env
         
 2. Install _jupyter notebook_ in the same env: the procedure are described here https://jupyter.org/install
         
 3. Install all _packages_ in your env: use the following command to install python libraries required for VERA. 
        
-        pip install package_name 
-        #(e.g. : pip install pandas)
+        > pip install package_name 
+        
+For example:
+
+        > pip install pandas
 
 You can find all packages required in the first chunk of VERA.ipynb file:
         
 ```python
 # Data Analisys library
-import pandas as pd
-import numpy as np
 import pandas as pd
 import numpy as np
 
@@ -46,12 +47,8 @@ import shutil
 from fpdf import FPDF
 from PyPDF2 import PdfFileMerger
 import xlsxwriter
-from tqdm import tqdm
 import matplotlib.pyplot as plt
-from rdkit.Chem.Draw import rdMolDraw2D
-from fpdf import FPDF
 from PyPDF2 import PdfFileMerger
-import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import ColorConverter 
         
