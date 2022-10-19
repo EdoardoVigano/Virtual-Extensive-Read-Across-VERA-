@@ -59,11 +59,11 @@ from matplotlib.colors import ColorConverter
 4. Download this repository 
 
 ## HOW TO USE THE VERA TOOL
-1. open with notebook Vera.ipynb
-2. choose the file names with target molecules.
+1. Open with notebook Vera.ipynb
+2. Choose the file names with target molecules.
   note: must be a .xlsx files with column name: SMILES
-3. Run the code.
-4. you can find a folder named **result** that contain pdf output and excel file
+3. Run the code
+4. You can find a folder named **result** that contain pdf output and excel file
 
 ## CONTACT
 
