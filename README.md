@@ -22,8 +22,8 @@ https://doi.org/10.3390/molecules27196605
        
         pip install package_name 
         #(e.g. : pip install pandas)
-       
-        You can find all packages required in the first chunk of VERA.ipynb file:
+
+You can find all packages required in the first chunk of VERA.ipynb file:
         
 ```python
 
