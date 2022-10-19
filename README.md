@@ -17,8 +17,8 @@ Viganò, E.L.; Colombo, E.; Raitano, G.; Manganaro, A.; Sommovigo, A.; Dorne, J.
 - Open the Anaconda Prompt (anaconda3).
 - Create and activate a new RDKit Python environment (my-rdkit-env) with the following commands:
         
-       > conda create -c https://conda.anaconda.org/rdkit -n my-rdkit-env rdkit
-       > conda activate my-rdkit-env
+       conda create -c https://conda.anaconda.org/rdkit -n my-rdkit-env rdkit
+       conda activate my-rdkit-env
         
 2. Install _jupyter notebook_ in the same env: the procedure are described here https://jupyter.org/install
         
