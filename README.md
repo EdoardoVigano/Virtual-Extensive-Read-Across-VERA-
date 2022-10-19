@@ -9,17 +9,23 @@ https://doi.org/10.3390/molecules27196605
 ## INSTALLATION
 ### HOW TO INSTALL 
 1. python and Anaconda are both required
-        - Download and install Anaconda from https://www.anaconda.com/distribution/. Choose Anaconda with Python 3
-        - Open the Anaconda Prompt (anaconda3).
-        - Create and activate a new RDKit Python environment (my-rdkit-env) with the following commands:
+- Download and install Anaconda from https://www.anaconda.com/distribution/. Choose Anaconda with Python 3
+- Open the Anaconda Prompt (anaconda3).
+- Create and activate a new RDKit Python environment (my-rdkit-env) with the following commands:
         
         ```
         conda create -c https://conda.anaconda.org/rdkit -n my-rdkit-env rdkit
         conda activate my-rdkit-env
         ```
         
-
 2. install all packages above in your env:
+
+Use the following command to install python libraries required for VERA. 
+        ```
+        pip install package_name 
+        #(e.g. : pip install pandas)
+        ```
+        You can find all packages required in the first chunk of VERA.ipynb file:
 ```python
 
         # Data Analisys library
