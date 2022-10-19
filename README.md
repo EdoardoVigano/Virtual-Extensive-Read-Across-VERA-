@@ -3,8 +3,12 @@
 A new open-access software for chemical read-across using structural alerts and chemical molecular groups
 Read-across applies the principle of similarity to identify the most similar substances to represent a given target substance in data poor situations. However, differences between the target and the source substances exist. The present study aims to screen and assess the effect of the key components in a molecule which may escape the evaluation for read-across based only on the most similar substance(s) using a new open-access software: Virtual Extensive Read-Across (VERA). VERA provides a means to assess similarity between chemicals using structural alerts specific to the property, pre-defined molecular groups and structural similarity. The software finds the most similar compounds with a certain feature e.g. structural alerts and molecular groups and provides clusters of similar substances while comparing these similar substances within different clusters. Carcinogenicity is a complex endpoint with several mechanisms, requiring resource intensive experimental bioassays, a large number of animals and the use of read-across as part of New Approach Methodologies would support carcinogenicity assessment. To test the VERA software, carcinogenicity was selected as the endpoint of interest for a range of botanicals. VERA correctly labelled 70% of the botanicals, indicating the most similar substances and the main features associated with carcinogenicity.
 
-Can you find more details here: 
-https://doi.org/10.3390/molecules27196605
+##### REFERENCE
+
+Further details on the algorithms used to performe read across assessment can be found in the reference pubblication:
+
+Viganò, E.L.; Colombo, E.; Raitano, G.; Manganaro, A.; Sommovigo, A.; Dorne, J.L.C.; Benfenati, E. Virtual Extensive Read-Across: A New Open-Access Software for Chemical Read-Across and Its Application to the Carcinogenicity Assessment of Botanicals. Molecules 2022, 27, 6605. https://doi.org/10.3390/molecules27196605 
+
 
 ## INSTALLATION
 ### HOW TO INSTALL 
@@ -26,31 +30,30 @@ https://doi.org/10.3390/molecules27196605
 You can find all packages required in the first chunk of VERA.ipynb file:
         
 ```python
+# Data Analisys library
+import pandas as pd
+import numpy as np
+import pandas as pd
+import numpy as np
 
-        # Data Analisys library
-        import pandas as pd
-        import numpy as np
-        import pandas as pd
-        import numpy as np
+# standard library
+import subprocess
+import os
+from tqdm import tqdm
+import shutil
 
-        # standard library
-        import subprocess
-        import os
-        from tqdm import tqdm
-        import shutil
-
-        # library useful for output
-        from fpdf import FPDF
-        from PyPDF2 import PdfFileMerger
-        import xlsxwriter
-        from tqdm import tqdm
-        import matplotlib.pyplot as plt
-        from rdkit.Chem.Draw import rdMolDraw2D
-        from fpdf import FPDF
-        from PyPDF2 import PdfFileMerger
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-        from matplotlib.colors import ColorConverter 
+# library useful for output
+from fpdf import FPDF
+from PyPDF2 import PdfFileMerger
+import xlsxwriter
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+from rdkit.Chem.Draw import rdMolDraw2D
+from fpdf import FPDF
+from PyPDF2 import PdfFileMerger
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib.colors import ColorConverter 
         
 ```
 4. Download this repository 
