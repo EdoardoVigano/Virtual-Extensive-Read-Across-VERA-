@@ -8,24 +8,23 @@ https://doi.org/10.3390/molecules27196605
 
 ## INSTALLATION
 ### HOW TO INSTALL 
-1. python and Anaconda are both required
-- Download and install Anaconda from https://www.anaconda.com/distribution/. Choose Anaconda with Python 3
+1. _python_ and _Anaconda_ are both required
+- Download and install _Anaconda_ from https://www.anaconda.com/distribution/. Choose Anaconda with Python 3
 - Open the Anaconda Prompt (anaconda3).
 - Create and activate a new RDKit Python environment (my-rdkit-env) with the following commands:
         
-        ```
         conda create -c https://conda.anaconda.org/rdkit -n my-rdkit-env rdkit
         conda activate my-rdkit-env
-        ```
         
-2. install all packages above in your env:
-
-Use the following command to install python libraries required for VERA. 
-        ```
+2. Install _jupyter notebook_ in the same env: the procedure are described here https://jupyter.org/install
+        
+3. Install all _packages_ in your env: use the following command to install python libraries required for VERA. 
+       
         pip install package_name 
         #(e.g. : pip install pandas)
-        ```
+       
         You can find all packages required in the first chunk of VERA.ipynb file:
+        
 ```python
 
         # Data Analisys library
@@ -54,13 +53,7 @@ Use the following command to install python libraries required for VERA.
         from matplotlib.colors import ColorConverter 
         
 ```
-        HOw to install a package?
-        e.g. : open your anaconda prompt activate your env and text: 
-                pip install package_name (e.g. : pip install pandas
-
-
-3. install jupyter notebook in the same env
-4. Download this repo 
+4. Download this repository 
 
 ## HOW TO USE THE VERA TOOL
 1. open with notebook Vera.ipynb
@@ -68,4 +61,17 @@ Use the following command to install python libraries required for VERA.
   note: must be a .xlsx files with column name: SMILES
 3. Run the code.
 4. you can find a folder named **result** that contain pdf output and excel file
-  
+
+## CONTACT
+
+Edoardo Luca Viganò
+
+Laboratory of Environmental Chemistry and Toxicology
+
+Department of Environmental Health Sciences
+
+Istituto di Ricerche Farmacologiche Mario Negri IRCCS
+
+Via Mario Negri 2, 20156 Milano, Italy
+
+e-mail: edoardo.vigano@marionegri.it
