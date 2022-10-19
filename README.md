@@ -50,7 +50,7 @@ Read-across applies the principle of similarity to identify the most similar sub
 3. install jupyter notebook in the same env
 4. Download this repo 
 
-# HOW TO USE THE VERA TOOL
+## HOW TO USE THE VERA TOOL
 1. open with notebook Vera.ipynb
 2. choose the file names with target molecules.
   note: must be a .xlsx files with column name: SMILES
