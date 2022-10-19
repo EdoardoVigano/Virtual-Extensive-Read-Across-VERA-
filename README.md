@@ -23,12 +23,9 @@ Viganò, E.L.; Colombo, E.; Raitano, G.; Manganaro, A.; Sommovigo, A.; Dorne, J.
 2. Install _jupyter notebook_ in the same env: the procedure are described here https://jupyter.org/install
         
 3. Install all _packages_ in your env: use the following command to install python libraries required for VERA. 
-       
-        > pip install package_name 
         
-For example:
-
-        > pip install pandas
+        pip install package_name
+        #pip install pandas
 
 You can find all packages required in the first chunk of VERA.ipynb file:
         
