@@ -14,14 +14,21 @@ Carcinogenicity is a complex endpoint with several mechanisms, requiring resourc
 
 Also the acute fish toxicity LC50 was selected as key endpoint to evaluated VERA for continuous endpoint.
 
+
 ##### REFERENCE
 
 Further details on the algorithms used to performe read across assessment can be found in the reference pubblication:
 
 Viganò, E.L.; Colombo, E.; Raitano, G.; Manganaro, A.; Sommovigo, A.; Dorne, J.L.C.; Benfenati, E. Virtual Extensive Read-Across: A New Open-Access Software for Chemical Read-Across and Its Application to the Carcinogenicity Assessment of Botanicals. Molecules 2022, 27, 6605. https://doi.org/10.3390/molecules27196605 
 
+## GUI VERSION 
 
-## INSTALLATION
+In [VEGAHUB](https://www.vegahub.eu/download/) a graphical user interface (GUI) version of VERA will be available soon.
+### HOW TO USE
+
+
+
+## INSTALLATION of Python code
 ### HOW TO INSTALL 
 1. _python_ and _Anaconda_ are both required
 - Download and install _Anaconda_ from https://www.anaconda.com/distribution/. Choose Anaconda with Python 3
