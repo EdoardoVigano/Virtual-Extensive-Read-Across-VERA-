@@ -24,7 +24,12 @@ Viganò, E.L.; Colombo, E.; Raitano, G.; Manganaro, A.; Sommovigo, A.; Dorne, J.
 ## GUI VERSION 
 
 In [VEGAHUB](https://www.vegahub.eu/download/) a graphical user interface (GUI) version of VERA will be available soon.
+
 ### HOW TO USE
+
+<p align="center">
+  <img width="350" height="389" src="IMG/img4.png">
+</p>
 
 
 
