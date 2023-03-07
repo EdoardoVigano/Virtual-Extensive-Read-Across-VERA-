@@ -80,7 +80,7 @@ At first, the summary of input molecule is shown, with the VERA assessment. The 
 Then, the first six similar compounds are shown, with the VEGA similarity, the Group Similarity (calculated according to the MGs in common and not with the target), the similarity mean and a list of all MG found in the similar. Summary information are reported in the excel file as well.
 
 <p align="center">
-  <img width="791" height="873" src="SCREENSHOT/pic8.png">
+  <img width="791" height="873" src="SCREENSHOT/pic9.png">
 </p>
 
 A focus on the toxic/non toxic prevalence of SAs and MGs is shown and than the result of cluster analysis.
