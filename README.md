@@ -27,10 +27,71 @@ In [VEGAHUB](https://www.vegahub.eu/download/) a graphical user interface (GUI) 
 
 ### HOW TO USE
 
+The VEGA GUI is a stand-alone application, it is not necessary to install the software. In VEGAHUB you can download the .zip folder of the program and open the tool by clicking on the .bat file.
+
 <p align="center">
   <img width="500" height="500" src="SCREENSHOT/pic1.png">
 </p>
 
+1. Load the .txt file with SMILES of target compounds (no header).
+
+<p align="center">
+  <img width="500" height="500" src="SCREENSHOT/pic2.png">
+</p>
+
+2. Select the folder for the output files
+
+<p align="center">
+  <img width="500" height="500" src="SCREENSHOT/pic3.png">
+</p>
+
+3. Choose the endpoint of interest
+
+<p align="center">
+  <img width="500" height="500" src="SCREENSHOT/pic4.png">
+</p>
+
+4. Click on _Start Calculation_ 
+<p align="center">
+  <img width="500" height="500" src="SCREENSHOT/pic5.png">
+</p>
+
+The folder chosen for results will contain one pdf file and an excel file for each substance and a .txt file with a summary of all predictions.
+
+#### Output example
+The excel file contain the information about all similar compounds used to make the assessment and molecular groups and structural alerts in common with the target molecule
+
+<p align="center">
+  <img width="657" height="398" src="SCREENSHOT/pic6.png">
+</p>
+
+The pdf file contain the output of the VERA read-across algorithm.
+
+At first, the summary of input molecule is shown, with the VERA assessment. The experimental value of target is reported if the molecule is already present in the database. The summary section includes also the information about the Structural Alerts and Molecular group identified in the target, with a colored bar representing the general toxic prevalence of this fragments in the database.
+
+<p align="center">
+  <img width="793" height="914" src="SCREENSHOT/pic7.png">
+</p>
+
+<p align="center">
+  <img width="793" height="562" src="SCREENSHOT/pic8.png">
+</p>
+
+Then, the first six similar compounds are shown, with the VEGA similarity, the Group Similarity (calculated according to the MGs in common and not with the target), the similarity mean and a list of all MG found in the similar. Summary information are reported in the excel file as well.
+
+<p align="center">
+  <img width="791" height="873" src="SCREENSHOT/pic8.png">
+</p>
+
+A focus on the toxic/non toxic prevalence of SAs and MGs is shown and than the result of cluster analysis.
+
+<p align="center">
+  <img width="794" height="889" src="SCREENSHOT/pic10.png">
+</p>
+
+<p align="center">
+  <img width="792" height="783" src="SCREENSHOT/pic11.png">
+</p>
 
 
 ## INSTALLATION of Python code
