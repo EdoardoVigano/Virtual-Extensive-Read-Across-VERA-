@@ -28,7 +28,7 @@ In [VEGAHUB](https://www.vegahub.eu/download/) a graphical user interface (GUI) 
 ### HOW TO USE
 
 <p align="center">
-  <img width="450" height="500" src="SCREENSHOT/pic1.png">
+  <img width="500" height="500" src="SCREENSHOT/pic1.png">
 </p>
 
 
