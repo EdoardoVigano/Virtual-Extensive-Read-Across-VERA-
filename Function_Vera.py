@@ -1,11 +1,6 @@
-## RICORDATI IL PATH PROGRAM TRA CASA E LAVOROO
+# import BB_calculator
+import Fish_calculator as BB_calculator
 
-
-# Alerts Beninigni bossa
-import Benigni_Bossa as BB
-import BB_calculator
-
-# alerts 2
 
 import pandas as pd
 import numpy as np
@@ -22,25 +17,22 @@ rdDepictor.SetPreferCoordGen(True)
 IPythonConsole.drawOptions.minFontSize=20
 
 import descriptor_calculator as dc
-import Function_for_descriptor as fd
 import Function_for_descriptor_tuple as Fdt
 
 from sklearn.preprocessing import scale
 from scipy.spatial import distance
 
 # internal pack
-import subprocess
 import os
 
 # statistic packages
 from scipy.spatial import distance
-from sklearn import preprocessing
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
 from sklearn.model_selection import LeaveOneOut
 from sklearn.model_selection import cross_val_score
-from sklearn.metrics import mean_squared_error, r2_score
-import statsmodels.api as sm
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
 
 
 global list_out 
@@ -49,8 +41,8 @@ Dataset_class = [1,0]
 
 # lista di gruppi funzionali "poco interessanti" quindi eliminati post
 list_out = ["COO2","C_O","C_O_noCOO","Ar_N","Ar_NH","Al_OH_noTert",
-            "Ar_N","benzaldehyde", 'halogen', 'hetero5', 'hetero6','piperdine','Alcool_1','nitro', 
-             'nitro_arom_nonortho']
+            "Ar_N","benzaldehyde", 'halogen','piperdine','Alcool_1','nitro', 
+             'nitro_arom_nonortho'] #'hetero5', 'hetero6' - rimessi nell'output il 24 Nov 23
     
 
 
@@ -106,14 +98,15 @@ class SingleMolecule:
 class MoleculeInput:
     
     # definisci il path per istsimilarity
-    
     path_program = os.getcwd()
     path_program = f"{path_program}/CustomFeaturesCLI/CustomFeaturesCLI.jar" 
-
+    # path_program = "/home/evigano/Scrivania/CustomFeaturesCLI/CustomFeaturesCLI.jar" #work
+    # path_program = f"/Users/edoar/Desktop/CustomFeaturesCLI/CustomFeaturesCLI.jar" #home
+    # path_program = "/Users/erika/Desktop/CustomFeaturesCLI/CustomFeaturesCLI.jar"
 
     def __init__(self, smile, simili):
 
-        ''' simili, must be a pandas dataframe, the output from Generator_Molecule'''
+        '''simili, must be a pandas dataframe, the output from Generator_Molecule'''
 
         self.smile = smile
         self.simili = simili # smiles e vega simililarity dei composti con similarità maggiore di 0.650 al target
@@ -259,8 +252,6 @@ class MoleculeInput:
         except:
             result['Distance'] = 0
         ###################################################################################    
-
-        # Questo ti serve
         # Emilio distance
         
         result['Grp_Similarity_Emilio'] = Emilio_distance 
@@ -274,7 +265,7 @@ class MoleculeInput:
         result = result.reset_index(drop=True)
         
         # eliminazione tra i simili delle forme cariche di molecole già presenti in forma neutra: 
-
+        """
         if any(result['charge+'][0:20])>0 and any(result['charge-'][0:20])>0:
             
             charge = result.drop(result[result['charge+']+result['charge-']==0].index)
@@ -293,7 +284,7 @@ class MoleculeInput:
                     
             result = result.drop(result[result['SMILES'].apply(lambda x: x in smile_remove)].index)
             result = result.reset_index(drop=True)
-            
+        """    
         result = result.drop(['charge+','charge-'], axis=1)
         if 'level_0' in result.keys(): del result['level_0']
         
@@ -345,8 +336,10 @@ class MoleculeInput:
                     k = k.reset_index(drop=True)
                     k['Target_Group'] = key
                     if len(k)>1:
+                        # 29/09
                         if k['Similarity'][0]==1: out = k[1:7]
                         else: out = k[0:6]
+                        # out = k[0:6]
                         out = out.reset_index(drop=True)
                         simili6.append(out)
 
@@ -393,13 +386,14 @@ class MoleculeInput:
 
                         k['Target_Group'] = key
                         k['Tox_reason'] = alert_gruppi['GROUPS'][0]
+                        # modifica 29/09
                         if k['Similarity'][0]==1: out = k[1:7]
                         else: out = k[0:6]
+                        # out = k[0:6]
                         out = out.reset_index(drop=True)
                         simili6.append(out)
         self.simili6 = simili6                 
         return simili6
-
 
     # procedura di reasoning per la classificazione
     def reasoning(self):
@@ -407,12 +401,14 @@ class MoleculeInput:
         classification = 'not define'
         exception = []
         out1 = []
+        # simili a 0.650 filtrati dagli alert
         df_simil_rdkit_noRedundant = self.filter_simil.copy()
         df_simil_rdkit_noRedundant.rename(columns={'Experimental value':'Class'},inplace=True)
+        # simili dei grouping
         simili6 = self.simili6
         alert = self.alerts_no_zero.copy().drop('SMILES', axis=1)  
-
-        if len(df_simil_rdkit_noRedundant)<3:  classification = 'no data'
+        # se non ci sono alemno 2 composti simili non si fa l'assessment
+        if len(df_simil_rdkit_noRedundant)<3:  classification = 'No data'
 
         # verifica per quale similarity è sorted df_simil_rdkit_noRedundant
         # verifica per quale similarity è sorted df_simil_rdkit_noRedundant
@@ -426,7 +422,6 @@ class MoleculeInput:
         if df_simil_rdkit_noRedundant['Similarity'][0]==1: 
             df_simil_rdkit_noRedundant = df_simil_rdkit_noRedundant[1:]
         '''
-      
 
         # Fase 1: 
         # Fase 1:
@@ -436,10 +431,12 @@ class MoleculeInput:
         # se i simili sono praticamente tutti di un valore sperimentale allora classifica in accordo
 
         if all(df_simil_rdkit_noRedundant['Class'][:10]==Dataset_class[0]) and len(df_simil_rdkit_noRedundant)>9:
-            classification = 'Active***(1)'
+            # classification = 'Active***(1)'
+            classification = 'Active***: the 10 more similar compounds are all active.'
 
         elif all(df_simil_rdkit_noRedundant['Class'][:10]==Dataset_class[1]) and len(df_simil_rdkit_noRedundant)>9: 
-            classification = 'NON-Active***(1)'
+            # classification = 'NON-Active***(1)'
+            classification = 'NON-Active***: the 10 more similar compounds are all Inactive.'
         
         # se su i 10 più simili si può già dire qualcosa (con una certa sicurezza) a livello statistico allora 
         # la procedura di reasoning sui gruppi non è necessaria
@@ -453,13 +450,22 @@ class MoleculeInput:
                 carci_value = round(sum(simili10_canc['Grp_Similarity_mean'])/len(simili10_canc),3)
                 nocarci_value = round(sum(simili10_nocanc['Grp_Similarity_mean'])/len(simili10_nocanc),3)
                 if len(simili10_canc)>len(simili10_nocanc) and carci_value>nocarci_value:
-                    if len(simili10_canc) > 8 : classification = 'Active***(2)'
-                    elif len(simili10_canc)<=8 and len(simili10_canc)>=7: classification =  'Active**(2)'
-                    elif len(simili10_canc)>6: classification = 'Active*(2)'
+                    if len(simili10_canc) > 8 : 
+                        classification = 'Active***: 9 of 10 most similar compounds are active'
+                        #  classification = 'Active***(2)'
+                    elif len(simili10_canc)<=8 and len(simili10_canc)>=7: 
+                        # classification =  'Active**(2)'
+                        classification = 'Active**: 8 of 10 most similar compounds are active'
+                    elif len(simili10_canc)>6: 
+                        # classification = 'Active*(2)'
+                        classification =  'Active**: 7 of 10 most similar compounds are active and the average similarity of the active compounds is greater than the inactive'
                 elif len(simili10_canc)>len(simili10_nocanc) and carci_value<nocarci_value: classification = 'equivocal2.0'
                 else:
-                    if len(simili10_nocanc) > 8 : classification = 'NON-Active**(2)'
-                    elif len(simili10_nocanc)<=8 and len(simili10_nocanc)>7: classification =  'NON-Active*(2)'
+                    if len(simili10_nocanc) > 8 : 
+                        # classification = 'NON-Active**(2)'
+                        classification = 'NON-Active*** at least 9 of 10 most similar compounds are Inactive'
+                    elif len(simili10_nocanc)<=8 and len(simili10_nocanc)>7: 
+                        classification =  'NON-Active** 8 of 10 most similar compounds are Inactive'
                     elif len(simili10_nocanc)>=5 and len(simili10_nocanc)<=7: classification = 'equivocal2.0'
             else:
                 classification = 'NO 10 data'
@@ -476,10 +482,11 @@ class MoleculeInput:
             # se tutti i più simili Grouping emilio sono active ( magari un pò ridondante con la prima.. ma è una casistica rara)
 
             if all(df_simil_rdkit_noRedundant['Class'][:6]==Dataset_class[0]) and len(list(alert.keys()))>0:
-                classification = 'Active***(3)'
-
+                classification = 'Active***: 6 more similar compounds are all Active.'
+                # classification = 'Active***(3)'
             elif all(df_simil_rdkit_noRedundant['Class'][:6]==Dataset_class[1]): 
-                classification = 'NON-Active***(3)'
+                # classification = 'NON-Active***(3)'
+                classification = 'NON-Active***: 6 more similar compounds are all Inactive.'
 
             # se i 6 più simili Grouping emilio non hanno tutti lo stesso vaore sperimentale 
             # allora procedura di reasoning:
@@ -530,10 +537,14 @@ class MoleculeInput:
                         for i in idx:
                             exception.append(simili6[i]['Target_Group'][0])
 
-                    # se active>50% per ogni grp ( questo sarà rindondante con condizioni sotto)
+                    # se active>50% per ogni grp (questo sarà rindondante con condizioni sotto)
                     number = sum(d1 > 2 for d1 in carcinogen1)
-                    if number == len(simili6) and number>0: # MOdifica: number>1 aggiunto il 9/09
-                        classification = 'Active***(4)'
+                    if number == len(simili6) and number>0: # Modifica: number>1 aggiunto il 9/09
+                        # classification = 'Active***(4)'
+                        # modifica reliability 5/settembre 23
+                        if number==1: classification = 'Active*: Each cluster has half of the compounds labelled as Active.'
+                        elif number==2: classification = 'Active**: Each cluster has half of the compounds labelled as Active.'
+                        else: classification = 'Active***: Each cluster has half of the compounds labelled as Active.'
                     else: 
                         
                         # merge dei cluster portandosi dietro la relativa etichetta (Active, NON-Active),
@@ -575,9 +586,13 @@ class MoleculeInput:
                         # se sono presenti solo cluster active:
                         if len(db_Noactive_smile)==0 and len(db_active_smile)>1: 
                             # se siamo nel caso di equivocal:
-                            if classification == 'equivocal2.0': classification = 'Active*(5)'
+                            if classification == 'equivocal2.0': 
+                                # classification = 'Active*(5)'
+                                classification = 'Active*: All cluster has defined as Active'
                             # altrimenti
-                            else: classification = 'Active***(5)'
+                            else: 
+                                # classification = 'Active***(5)'
+                                classification = 'Active*: All cluster has defined as Active'
 
                         # se è presente solo 1 cluster ed è Active: 
                         elif len(db_Noactive_smile)==0 and len(db_active_smile)==1:
@@ -588,14 +603,25 @@ class MoleculeInput:
                             
                             # tra i simili se predominano quelli experimental tox allora active
                             if len(simili10_canc)>(len(simili10)-len(simili10_canc)):
-                                classification = 'Active**(5)'
+                                # classification = 'Active**(5)'
+                                classification = 'Active**: Is present only one Active cluster and the 10 more similar compounds are predominantly toxic'
                             else:
                                 classification = 'Equivocal 3.0'
 
                         # se sono presenti solo clusters Inactive:            
                         if len(db_active_smile)==0 and len(db_Noactive_smile)>1: 
-                            if classification == 'equivocal2.0': classification = 'NON-Active*(6)'
-                            else:classification = 'NON-Active***(6)'
+                            if classification == 'equivocal2.0': 
+                                # classification = 'NON-Active***(6)'
+                                classification = 'NON-Active*: All cluster has defined as Inactive'
+                            else: 
+                                # classification = 'NON-Active*(6)'
+                                if len(db_Noactive_smile)>2: 
+                                    classification = 'NON-Active***: All cluster has defined as Inactive'
+                                elif len(db_Noactive_smile)>1: 
+                                    classification = 'NON-Active**: All cluster has defined as Inactive'
+                                else:
+                                    classification = 'NON-Active*: All cluster has defined as Inactive'
+                                
 
                         # se è presente solo 1 cluster ed è Inctive:        
                         elif len(db_Noactive_smile)==1 and len(db_active_smile) == 0:
@@ -603,7 +629,9 @@ class MoleculeInput:
                             simili10_nocanc = simili10.drop(simili10[simili10['Class']==Dataset_class[0]].index)
                             # tra i simili se predominano quelli experimental notox allora non-active
                             if len(simili10_nocanc)>(len(simili10)-len(simili10_nocanc)):
-                                classification = 'NON-Active*(7)'
+                                # classification = 'NON-Active*(7)'
+                                classification = 'NON-Active**: Is present only one Inactive cluster and the 10 more similar compounds are predominantly NON-toxic'
+                           
                             else:
                                 classification = 'Equivocal 3.0'  
 
@@ -651,68 +679,95 @@ class MoleculeInput:
 
                                     if treshold_carc>=83:
                                         if round((sum(db_active_smile['Class']==Dataset_class[0])/len(db_active_smile))*100,0)>=83:
-                                            classification = 'Active***(8)' 
+                                            # classification = 'Active***(8)' 
+                                            classification = 'Active***: The compounds having the characteristics of several clusters are mainly toxic'
                                         elif round((sum(db_active_smile['Class']==Dataset_class[0])/len(db_active_smile))*100,0)<83 and round((sum(db_active_smile['Class']==Dataset_class[0])/len(db_active_smile))*100,0)>=66:
-                                            classification = 'Active**(8)'
-                                        else: classification = 'Active*(8)'
+                                            # classification = 'Active**(8)'
+                                            classification = 'Active**: The compounds having the characteristics of several clusters are mainly toxic'
+                                        else: 
+                                            # classification = 'Active*(8)'
+                                            classification = 'Active**: The compounds having the characteristics of several clusters are mainly toxic'
                                     elif treshold_Nocarc>=83:
                                         if round((sum(db_Noactive_smile['Class']==Dataset_class[1])/len(db_Noactive_smile))*100,0)>=83:
-                                            classification = 'NON-Active***(8)' 
+                                            # classification = 'NON-Active***(8)'
+                                            classification = 'NON-Active***: The compounds having the characteristics of several clusters are mainly NO-toxic'
                                         elif round((sum(db_Noactive_smile['Class'] ==Dataset_class[1])/len(db_Noactive_smile))*100,0)<83 and round((sum(db_Noactive_smile['Class']==Dataset_class[1])/len(db_Noactive_smile))*100,0)>=66:
-                                            classification = 'NON-Active**(8)'
-                                        else: classification = 'NON-Active*(8)'
+                                            # classification = 'NON-Active**(8)'
+                                            classification = 'NON-Active**: The compounds having the characteristics of several clusters are mainly NO-toxic'
+                                        else: 
+                                            classification = 'NON-Active*: The compounds having the characteristics of several clusters are mainly NO-toxic'
+                                            # classification = 'NON-Active*(8)'
 
                                 elif  merg_treshold<=50 and merg_treshold>16:
                                     if treshold_carc>=83:
-                                        classification = 'Active***(9)' 
+                                        # classification = 'Active***(9)' 
+                                        classification = 'Active***: The compounds having the characteristics of several clusters are mainly toxic'
                                     if treshold_carc>=50 and treshold_carc<83:
-                                        classification = 'Active*(9)'
+                                        # classification = 'Active*(9)'
+                                        classification = 'Active*: The compounds having the characteristics of several clusters are mainly toxic'
                                     if treshold_carc>=33 and treshold_carc<50:
-                                        classification = 'Active*(9)E'
+                                        # classification = 'Active*(9)E'
+                                        classification = 'Active*: The compounds having the characteristics of several clusters are mainly toxic'
                                     if treshold_Nocarc>=83: 
                                         if round((sum(db_Noactive_smile['Class']==Dataset_class[1])/len(db_Noactive_smile))*100,0)>=83:  
-                                            classification = 'NON-Active***(9)'
+                                            # classification = 'NON-Active***(9)'
+                                             classification = 'NON-Active***: The compounds having the characteristics of several clusters are mainly NO-toxic'
                                         if  round((sum(db_Noactive_smile['Class']==Dataset_class[1])/len(db_Noactive_smile))*100,0)>=66 and round((sum(db_Noactive_smile['Class']==Dataset_class[1])/len(db_Noactive_smile))*100,0)<83:
-                                            classification = 'NON-Active**(9)'
+                                            # classification = 'NON-Active**(9)'
+                                             classification = 'NON-Active**: The compounds having the characteristics of several clusters are mainly NO-toxic'
                                         if  round((sum(db_Noactive_smile['Class']==Dataset_class[1])/len(db_Noactive_smile))*100,0)<66:   
-                                            classification = 'NON-Active*(9)'
+                                            # classification = 'NON-Active*(9)'
+                                             classification = 'NON-Active*: The compounds having the characteristics of several clusters are mainly NO-toxic'
 
 
                                 elif  merg_treshold>50:
                                     if  treshold_Nocarc>=83: 
                                         if round((sum(db_Noactive_smile['Class']==Dataset_class[1])/len(db_Noactive_smile))*100,0)>83:  
-                                            classification = 'NON-Active***(10)'
+                                            # classification = 'NON-Active***(10)'
+                                             classification = 'NON-Active***: The compounds having the characteristics of several clusters are mainly NO-toxic'
                                         if  round((sum(db_Noactive_smile['Class']==Dataset_class[1])/len(db_Noactive_smile))*100,0)>=66 and round((sum(db_Noactive_smile['Class']==Dataset_class[1])/len(db_Noactive_smile))*100,0)<83:
-                                            classification = 'NON-Active**(10)'
+                                            # classification = 'NON-Active**(10)'
+                                             classification = 'NON-Active**: The compounds having the characteristics of several clusters are mainly NO-toxic'
                                         if  round((sum(db_Noactive_smile['Class']==Dataset_class[1])/len(db_Noactive_smile))*100,0)<66:   
-                                            classification = 'NON-Active*(10)'
+                                            # classification = 'NON-Active*(10)'
+                                             classification = 'NON-Active*: The compounds having the characteristics of several clusters are mainly NO-toxic'
                                     if  treshold_Nocarc<83 and treshold_Nocarc>50: classification = 'Uncertain' 
-                                    if treshold_Nocarc>=16 and treshold_Nocarc<=50: classification = 'Active*(10)'
+                                    if treshold_Nocarc>=16 and treshold_Nocarc<=50: 
+                                        # classification = 'Active*(10)'
+                                         classification = 'Active*: The compounds having the characteristics of several clusters are mainly toxic'
                              
                             # se non hanno composti in comune i CLUSTERS
                             elif classification == 'not define':
 
                                 Noactive_nocarc = round(((sum(db_Noactive_smile['Class']==Dataset_class[1]))/(len(db_Noactive_smile)))*100,0)
                                 active_carc = round(((sum(db_active_smile['Class']==Dataset_class[0]))/(len(db_active_smile)))*100,0)
-                                perc_sul_tot_Nocanc = round((((sum(db_Noactive_smile['Class']==Dataset_class[1])+sum(db_active_smile['Class']==Dataset_class[1])))/(len(db_Noactive_smile)+len(db_active_smile)))*100,0)
-
-                                if active_carc>=83: classification = 'Active***(11)'
+                                
+                                if active_carc>=83: 
+                                    # classification = 'Active***(11)'
+                                    classification = 'Active***: The population of compounds in active clusters is numerically predominant'
                                 if active_carc>=66 and Noactive_nocarc>=83: classification = 'Equivocal'
-                                if active_carc>=66 and Noactive_nocarc>=66: classification = 'Active*(11)'
-                                if active_carc>=50 and active_carc<83 and Noactive_nocarc>=83: classification = 'NON-Active*'
+                                if active_carc>=66 and Noactive_nocarc>=66: 
+                                    # classification = 'Active*(11)'
+                                    classification = 'Active*: The population of compounds in active clusters is numerically predominant'
+                                if active_carc>=50 and active_carc<83 and Noactive_nocarc>=83: 
+                                    # classification = 'NON-Active*'
+                                    classification = 'NON-Active*: The population of compounds in Inctive clusters is numerically predominant'
                                 if active_carc>=50 and active_carc<83 and Noactive_nocarc>=66 and Noactive_nocarc<83: 
                                     classification = 'Equivocal'                                                 
                         else:
                             
                             if len(db_merg) != 0:
                                 if rateo != 100 or rateo != 1: # queste casistiche sarebbero già considerate
-                                    if rateo>75: classification = 'Active**(12)'
-                                    if rateo<25 and rateo>0: classification = 'NON-Active**(12)'
+                                    if rateo>75: 
+                                        # classification = 'Active**(12)'
+                                        classification = 'Active**: The population of compounds in active clusters is numerically predominant'
+                                    if rateo<25 and rateo>0: 
+                                        # classification = 'NON-Active**(12)'
+                                        classification = 'NON-Active**: The population of compounds in active clusters is numerically predominant'
                                     if rateo == 0: classification = 'no group'
 
 
                     out = [exception,classification]
-
 
                 else:
                     exception = []
@@ -748,7 +803,7 @@ class MoleculeInput:
                         out1.append([exception_df_Carcino_lst, exception_df_NoCarcino_lst])
 
         # se il reasoning non ha portato a nulla: knn               
-        if classification in ['not define', 'NO 10 data', 'No data for groups']:
+        if classification in ['not define', 'NO 10 data', 'No data for groups', 'No data']: # 'No data aggiunto 29/09
             df_simil_rdkit_noRedundant.sort_values('Similarity', inplace=True)
             df_simil_rdkit_noRedundant.reset_index(drop=True, inplace = True)
             if len(df_simil_rdkit_noRedundant)>1 and np.mean(df_simil_rdkit_noRedundant['Similarity'][:2])>=0.80:
@@ -765,14 +820,16 @@ class MoleculeInput:
     def reasoning_intero(self, Tox):
         
         self.Calculate_grp()
+        # simili a 0.650
         df_simil_rdkit_noRedundant = MoleculeInput.filter_simil(self)
+        # calcola gruppi sul target
         target = SingleMolecule.Mol_group_removeRedundant_no_zero(SingleMolecule(self.smile)).drop('SMILES', axis=1)
-        
+        # valuta i gruppi di reasoning
         if len(self.simili6)>0: simili6 = self.simili6
         else: 
             MoleculeInput.ortogonal_research(self, Tox)
             simili6 = self.simili6
-        
+        # drop caariche, non sono un MG
         if any(pd.Series(target.keys()).apply(lambda x: x in ['charge-', 'charge+'])):
             if 'charge-' in target.keys():
                 target = target.drop('charge-',axis=1)
@@ -790,7 +847,7 @@ class MoleculeInput:
         df_simil_rdkit_noRedundant.reset_index(drop=True, inplace=True)
         value = []
         
-        # knn, se serve il reasoning metti yes
+        # knn, se serve il reasoning metti yes: se non valogono i criteri per il knn (yes)
         if len(df_simil_rdkit_noRedundant)>2:
 
             value.append(np.inner(np.power(np.array(df_simil_rdkit_noRedundant[simil_type][:3]),3),
@@ -807,14 +864,17 @@ class MoleculeInput:
 
         # valore medio pesato dei singoli grp del reasoning
         simil_value = []
-        for grp in simili6:
-            if len(grp)>1 and np.mean(grp[simil_type][:2])>=0.75: # criteri per il reasoning #0.80, 3 valori pre 6-luglio
-                
-                pred_grp = (np.inner(np.power(np.array(grp[simil_type][:3]),3),np.array(grp['Class'][:3])))/(np.sum(np.power(np.array(grp[simil_type][:3]),3)))
-                simil_value.append(pred_grp)
+        if len(simili6)>1: # aggiunto 20/10/2022
+            for grp in simili6:
+                if len(grp)>1 and np.mean(grp[simil_type][:2])>=0.75: # criteri per il reasoning #0.80, 3 valori pre 6-luglio
+                    pred_grp = (np.inner(np.power(np.array(grp[simil_type][:3]),3),np.array(grp['Class'][:3])))/(np.sum(np.power(np.array(grp[simil_type][:3]),3)))
+                    simil_value.append(pred_grp)
 
+        ########################## modelli lineari ##################################à
+        # se i dati sono sufficienti
         if value[0]!='no data':
             
+            # aggiungi alert a gruppi
             cv = LeaveOneOut()
             descr1 = SingleMolecule.Alerts(SingleMolecule(self.smile))
             descr = SingleMolecule.Mol_group_removeRedundant(SingleMolecule(self.smile))
@@ -828,7 +888,8 @@ class MoleculeInput:
 
             #modello sui simili con descrittori grp target
             if len(list(target.keys()))>0:
-                modello2 = LinearRegression()            
+                modello2 = LinearRegression()
+                modello2.random_state = 42             
                 modello2.fit(X_train[list(target.keys())],y_train)
                 scores = cross_val_score(modello2,X_train[list(target.keys())],y_train, 
                                         scoring='neg_mean_absolute_error',
@@ -840,23 +901,30 @@ class MoleculeInput:
                 modello2_err = 'no target grp'
             
             #modello sui simili con descrittori tutti
-            modello3 = LinearRegression()            
+            modello3 = LinearRegression()
+            modello3.random_state = 42           
             modello3.fit(X_train, y_train)
             scores = cross_val_score(modello3, X_train, y_train, scoring='neg_mean_absolute_error',
                         cv = cv, n_jobs=-1)
             modello3_err = np.mean(np.absolute(scores))
             p3 = modello3.predict(descr.drop('SMILES', axis=1))
 
-            # modello sui simili con descrittori non grp target
-            X_train2 = X_train.drop(list(target.keys()),axis=1)
-            modello4 = LinearRegression()            
-            modello4.fit(X_train2, y_train)
-            descr.drop(list(target.keys()), axis=1, inplace=True)
-            scores = cross_val_score(modello4, X_train2, y_train, scoring = 'neg_mean_absolute_error',
+            # modello sui simili con descrittori molecolari
+            X_ = MoleculeInput.descriptor_similarity(self)
+            X_train2 = X_.iloc[:, -12:-1]
+            modello4 = LinearRegression()
+            modello4.random_state = 42
+            process = [('num', SimpleImputer(strategy='median')),
+                       ('scaling', StandardScaler()),
+                       ('model', modello4)]
+
+            my_pipeline = Pipeline(steps = process)                
+            my_pipeline.fit(X_train2, y_train)
+            target_y_descr = Descriptors_Calculator(self.smile)
+            scores = cross_val_score(my_pipeline, X_train2, y_train, scoring = 'neg_mean_absolute_error',
                         cv = cv, n_jobs=-1)
             modello4_err = np.mean(np.absolute(scores))           
-            p4 = modello4.predict(descr.drop('SMILES', axis=1))
-
+            p4 = my_pipeline.predict(target_y_descr)
 
             err = [modello2_err, modello3_err, modello4_err] 
 
@@ -865,43 +933,69 @@ class MoleculeInput:
                 min_err = err.index(min(err))             
                 if min_err == 0:
                     best_value = p3
+                    predictions = modello3.predict(X_train) 
                 elif min_err == 1:
                     best_value = p4
+                    predictions = my_pipeline.predict(X_train2) 
             else:
                 min_err = err.index(min(err))
                 if min_err == 0:
                     best_value = p2
+                    predictions = modello2.predict(X_train[list(target.keys())])
                 elif min_err == 1:
-                    best_value = p3            
+                    best_value = p3
+                    predictions = modello3.predict(X_train)           
                 elif min_err == 2:
-                    best_value = p4 
+                    best_value = p4
+                    predictions = my_pipeline.predict(X_train2) 
                     
             err = round(min(err),2)
             # p = round(p[0],3)
             best_value = round(best_value[0],3)
+            #and type(simil_value_pt2[0])==str   
+            if simil_value != []: 
+                simil_value_medio = round(sum(simil_value)/len(simil_value),3)
+                Linear = 'no'
+            else: 
+                simil_value_medio = 'no data'
+                Linear = 'yes'
+            if isinstance(err, float):
+                if reasoning == 'no': pred_type = 'Knn'
+                elif reasoning == 'yes':
+                    if Linear == 'no': pred_type = 'Reasoning'
+                    elif Linear == 'yes':
+                        # Modifica 19/1 err = 0.5 
+                        if err < 1: pred_type = 'Linear'
+                        else: pred_type = 'Global'
+                else:             
+                    if Linear == 'no': pred_type = 'Reasoning'
+                    elif Linear == 'yes':
+                        # Modifica 19/1 prima err = 0.5
+                        if err < 1: pred_type = 'Linear'
+                        else: pred_type = 'Global' # no data o global?
+            else: pred_type = 'Global' # Modifica 19/1 prima era 'no data'
 
         else:
-            p = 'no data'
             reasoning = 'no data'
             err = 'no data'
             best_value = 'no data'
             Linear = 'no data'
-
-        #and type(simil_value_pt2[0])==str   
-        if len(simil_value)>0: 
-            simil_value_medio = round(sum(simil_value)/len(simil_value),3)
-            Linear = 'no'
-        else: 
+            predictions = 'no data' 
+            pred_type = 'no data' # Modifica 19/1 prima era 'no data'
             simil_value_medio = 'no data'
-            Linear = 'yes'
-        
+            y_train = 'no data'
+
+
         out_frame = {'SMILES': self.smile, 
                     'Knn': value[0], 
                     'Grouping Value': simil_value_medio,
                     'LinearModel': best_value,
                     'err': err, 
                     'reasoning': reasoning,
-                    'LocalModel': Linear}
+                    'LocalModel': Linear,
+                    'pred_type': pred_type,
+                    'predictions': predictions,
+                    'exp value local': y_train}
 
 
         out_frame1 = pd.DataFrame([out_frame])
@@ -919,7 +1013,6 @@ class MoleculeInput:
         simili_same_scaffold.reset_index(drop=True, inplace=True)
         self.scaffold = simili_same_scaffold.copy()
         return simili_same_scaffold
-
 
     def descriptor_similarity(self):
         
@@ -953,9 +1046,6 @@ class MoleculeInput:
         data_out.sort_values('descriptor_similarity', inplace=True)
         data_out.reset_index(drop=True, inplace=True)
         return data_out
-
-
-
 
 # generatore di oggetti della classe principale
 # ogni oggetto è definito con la smiles del target e il subset
@@ -1192,6 +1282,36 @@ def remove_Redundant(a:Chem.rdchem.Mol, b:pd.DataFrame): #dove b è grp_rdkit_ta
 
     b['priamide'] = b['priamide']-len(del_priamide_set)
 
+
+
+    # ketone 1/16
+
+    c = Fdt.f_ketone(a)
+
+    b1 = Fdt.f_ketone_aliphatic(a)
+    b2 = Fdt.f_Ar_ketone(a)
+
+
+    t = [b1,b2]
+    
+    del_ketone = []
+    
+    for ketone in c:
+        for j, k in enumerate(t):
+            if len(k)>0 and type(k) is tuple:
+                for i in range(len(k)):
+                    if len(set(k[i]).intersection(ketone))>0:
+                        del_ketone.append(ketone)
+            elif len(k)>0 and type(k) is list:
+                for i in range(len(k)): 
+                    if len(k[i])>0:
+                        for z in k[i]:
+                            if len(set(z).intersection(ketone))>0:
+                                del_ketone.append(ketone)
+    del_ketone_set = set(del_ketone)
+
+    b['ketone'] = b['ketone']-len(del_ketone_set)
+
     # Ar_COR
     c = Fdt.f_ketone(a)
     c1 = Fdt.f_ketone_Topliss(a)
@@ -1237,15 +1357,42 @@ def remove_Redundant(a:Chem.rdchem.Mol, b:pd.DataFrame): #dove b è grp_rdkit_ta
     
     #quatN == NH2?
     b['NH2'] = b['NH2'] + b['quatN']
-    
-    #estere e etere
 
-    c = Fdt.f_ether(a)
+    # togli methoxy se estere 
+    # 29/09
+    c = Fdt.f_methoxy(a)
 
     b1 = Fdt.f_ester(a)
 
     t = [b1]
+    del_methoxy = []
+    for methoxy in c:
+        for j, k in enumerate(t):
+            if len(k)>0 and type(k) is tuple:
+                for i in range(len(k)):
+                    if len(set(k[i]).intersection(methoxy))>0:
+                        del_methoxy.append(methoxy)
+            elif len(k)>0 and type(k) is list:
+                for i in range(len(k)): 
+                    if len(k[i])>0:
+                        for z in k[i]:
+                            if len(set(z).intersection(methoxy))>0:
+                                del_methoxy.append(methoxy)                 
+    del_methoxy_set = set(del_methoxy)
+    b['methoxy'] = b['methoxy']-len(del_methoxy_set)
+
+
     
+    # togli etere se estere e methoxy 
+
+    c = Fdt.f_ether(a)
+
+    b1 = Fdt.f_ester(a)
+    # 29/09
+    b2 = Fdt.f_methoxy(a)
+
+    # t = [b1]
+    t = [b1, b2]
     del_ether = []
     for ether in c:
         for j, k in enumerate(t):
@@ -1285,6 +1432,34 @@ def remove_Redundant(a:Chem.rdchem.Mol, b:pd.DataFrame): #dove b è grp_rdkit_ta
                                 del_Ar_OH.append(Ar_OH)                 
     del_Ar_OH_set = set(del_Ar_OH)
     b['Ar_OH'] = b['Ar_OH']-len(del_Ar_OH_set)
+    
+    # Biclycle 24 Nov 23 ERIKA
+
+    c = Fdt.f_bicyclic(a)
+
+    b1 = Fdt.f_Ar_bicycle(a)
+    b2 = Fdt.f_Al_bicycle(a)
+
+
+    t = [b1,b2]
+    
+    del_bicycle = []
+    
+    for bicycle in c:
+        for j, k in enumerate(t):
+            if len(k)>0 and type(k) is tuple:
+                for i in range(len(k)):
+                    if len(set(k[i]).intersection(bicycle))>0:
+                        del_bicycle.append(bicycle)
+            elif len(k)>0 and type(k) is list:
+                for i in range(len(k)): 
+                    if len(k[i])>0:
+                        for z in k[i]:
+                            if len(set(z).intersection(bicycle))>0:
+                                del_bicycle.append(bicycle)
+    del_bicycle_set = set(del_bicycle)
+
+    b['bicyclic'] = b['bicyclic']-len(del_bicycle_set)
 
     
     #charge remove in N03
@@ -1334,12 +1509,12 @@ def remove_Redundant(a:Chem.rdchem.Mol, b:pd.DataFrame): #dove b è grp_rdkit_ta
 
     #if b.keys().any() in list_out: 
     b.drop(list_out, axis=1, inplace=True)
+    # test 29/09  prima non c'era 
     num = b._get_numeric_data()
     num[num < 0] = 0
     
     return b 
         
-
 def cassification(a): 
     if a > 65: 
         classification='Tox'
@@ -1381,10 +1556,20 @@ def prevalence_threshold(Dataset, *args):
     frame = pd.DataFrame(dic)
     frame = frame.drop(frame[frame['GROUPS'].apply(lambda x: x in ['Class','SMILES'])].index)
     frame['Prevalence%'] = (frame['Active']/(frame['Active']+frame['NoActive']))*100
-    frame['Prevalence%'] = round(frame['Prevalence%'].fillna(-1),0)
+    frame['Prevalence%'] = round(frame['Prevalence%'].fillna(-1),3)
     frame['Tox'] =  frame['Prevalence%'].apply(lambda x: cassification(x))
-    return frame
 
+# Aggiunta del 24 Nov 23
+    Tox = frame.copy()
+    ac = len(Dataset_active)
+    noac = len(Dataset_Noactive)
+    ToxClu = Tox.copy()
+    ToxClu['ActiveScale'] = ToxClu['Active']/ac
+    ToxClu['NOActiveScale'] = ToxClu['NoActive']/noac
+    ToxClu['Prevalence%Scale'] = (ToxClu['ActiveScale']/(ToxClu['ActiveScale']+ToxClu['NOActiveScale']))*100
+    ToxClu['ToxScale'] = ToxClu['Prevalence%Scale'].apply(lambda x: cassification(x))
+    
+    return ToxClu
 
 
 def prevalence(Dataset):
@@ -1395,8 +1580,7 @@ def prevalence(Dataset):
         Dataset_Mol.append(mol2)
     for i, smile in enumerate(Dataset_Mol):
         if i==0:
-            df_groups = SingleMolecule.Mol_group_removeRedundant(smile)
-            
+            df_groups = SingleMolecule.Mol_group_removeRedundant(smile)       
         else:
             df_groups = df_groups.append(SingleMolecule.Mol_group_removeRedundant(smile))
 
@@ -1411,7 +1595,7 @@ def prevalence(Dataset):
     frame = pd.DataFrame(dic)
     frame = frame.drop(frame[frame['GROUPS'].apply(lambda x: x in ['Class','SMILES'])].index)
     frame['Prevalence%'] = (frame['Active']/(frame['Active']+frame['NoActive']))*100
-    frame['Prevalence%'] = round(frame['Prevalence%'].fillna(-1),0)
+    frame['Prevalence%'] = round(frame['Prevalence%'].fillna(-1),3)
     frame['Tox'] =  frame['Prevalence%'].apply(lambda x: cassification(x))
     Tox = frame.copy()
     ac = len(Dataset_active)
@@ -1422,6 +1606,46 @@ def prevalence(Dataset):
     ToxClu['Prevalence%Scale'] = (ToxClu['ActiveScale']/(ToxClu['ActiveScale']+ToxClu['NOActiveScale']))*100
     ToxClu['ToxScale'] = ToxClu['Prevalence%Scale'].apply(lambda x: cassification(x))
     
+    return ToxClu
+
+def prevalence_alerts(Dataset):
+
+    '''def prevalence for alerts'''
+    
+    Dataset_Mol = []
+    
+    for mol_input in (Dataset['SMILES']):
+        mol2 = SingleMolecule(mol_input)
+        Dataset_Mol.append(mol2)
+        
+    for i, smile in enumerate(Dataset_Mol):
+            if i==0:
+                df_groups = SingleMolecule.Alerts(smile)       
+            else:
+                df_groups = df_groups.append(SingleMolecule.Alerts(smile) )
+
+    df_groups = df_groups.reset_index(drop=True)
+    df_groups = df_groups.assign(SMILES = Dataset['SMILES'],Class = Dataset['Experimental value'])
+    df_all = df_groups.copy()
+
+    Dataset_active = df_all.loc[df_all['Class']==Dataset_class[0]].reset_index(drop=True)
+    Dataset_Noactive = df_all.loc[df_all['Class']==Dataset_class[1]].reset_index(drop=True)
+
+    dic = {'GROUPS':list(Dataset_active.keys()),'Active':list(Dataset_active.sum()),'NoActive':list(Dataset_Noactive.sum())}
+    frame = pd.DataFrame(dic)
+    frame = frame.drop(frame[frame['GROUPS'].apply(lambda x: x in ['Class','SMILES'])].index)
+    frame['Prevalence%'] = (frame['Active']/(frame['Active']+frame['NoActive']))*100
+    frame['Prevalence%'] = round(frame['Prevalence%'].fillna(-1),3)
+    frame['Tox'] =  frame['Prevalence%'].apply(lambda x: cassification(x))
+    Tox = frame.copy()
+    ac = len(Dataset_active)
+    noac = len(Dataset_Noactive)
+    ToxClu = Tox.copy()
+    ToxClu['ActiveScale'] = ToxClu['Active']/ac
+    ToxClu['NOActiveScale'] = ToxClu['NoActive']/noac
+    ToxClu['Prevalence%Scale'] = (ToxClu['ActiveScale']/(ToxClu['ActiveScale']+ToxClu['NOActiveScale']))*100
+    ToxClu['ToxScale'] = ToxClu['Prevalence%Scale'].apply(lambda x: cassification(x))
+
     return ToxClu
 
 def prevalence_threshold_alerts(Dataset, *args):
@@ -1474,7 +1698,7 @@ def prevalence_threshold_alerts(Dataset, *args):
     frame = pd.DataFrame(dic)
     frame = frame.drop(frame[frame['GROUPS'].apply(lambda x: x in ['Class','SMILES'])].index)
     frame['Prevalence%'] = (frame['Active']/(frame['Active']+frame['NoActive']))*100
-    frame['Prevalence%'] = round(frame['Prevalence%'].fillna(-1),0)
+    frame['Prevalence%'] = round(frame['Prevalence%'].fillna(-1),3)
     frame['Tox'] =  frame['Prevalence%'].apply(lambda x: cassification(x))
     return frame
 
@@ -1503,7 +1727,6 @@ def view_difference(smile1, smile2):
             target_atm2.append(atom.GetIdx())
             
     return Draw.MolsToGridImage([mol1, mol2],highlightAtomLists=[target_atm1, target_atm2])
-
 
 def Descriptors_Calculator(smile):
     
@@ -1546,7 +1769,6 @@ def Descriptors_Calculator(smile):
     Descriptors_result = pd.DataFrame([dic])
     
     return Descriptors_result
-
 
 def all_rdkit_descriptors(smile):
 
@@ -1616,7 +1838,6 @@ def DataCuration(Dataset: pd.DataFrame):
     Dataset.reset_index(drop=True, inplace=True)
     return [Dataset,Data_error]
 
-
 def DataCurationTarget(Dataset: pd.DataFrame):
 
     '''curation like Datacurtation functions but not delate duplicates'''
@@ -1664,7 +1885,6 @@ def DataCurationTarget(Dataset: pd.DataFrame):
         Dataset.reset_index(drop=True, inplace=True)
     return [Dataset,Data_error]
 
-
 def scaffold(smile1, smile2):
 
     'If 2 molecule have the same scaffold return 1'
@@ -1683,8 +1903,7 @@ def scaffold(smile1, smile2):
             out =0
     except:
         out =0 
-    
-    
+     
 def scaffold_index(smile):
     '''atoms and bonds index for output, index of atoms and bond 
         of the scaffold in molecule similar to target

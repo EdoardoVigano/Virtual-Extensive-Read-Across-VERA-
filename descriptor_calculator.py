@@ -1,7 +1,6 @@
 import Function_for_descriptor as fd #MY LIBRARY
 import pandas as pd
 from rdkit import Chem
-from rdkit.Chem import Fragments
 
 
 def descriptor(mol: Chem.rdchem.Mol):
@@ -43,6 +42,7 @@ def descriptor(mol: Chem.rdchem.Mol):
     CH2_Terminal_list = []
     Alcool_1_list = []
     
+    
     #22/12
     triple_list = []
     
@@ -72,7 +72,9 @@ def descriptor(mol: Chem.rdchem.Mol):
     Ar_ketone = []
     ketone_dehydro =[]
     
-    
+    #23 Nov 23 - Ar and Al bicycle
+    Ar_bicycle = []
+    Al_bicycle = []
     
 
     lst_chemical_groups=[Al_COO,Al_OH,Al_OH_noTert,ArN,Ar_N,Ar_NH,Ar_OH,COO2,C_O,C_O_noCOO,C_S,HOCCN,Imine,NH0,NH1,NH2,N_O,
@@ -87,7 +89,7 @@ def descriptor(mol: Chem.rdchem.Mol):
                          benzaldehyde_list, biphenol_list, Ar_OR_list, Ar_R_list, op_diphenolo_OR_list, Ar_COR_list, Ar_COO_R_H_list, 
                          C_3phenols_list, Ar_Cl_Br_list, Ring_3OH_3OR_list, Sulfoxide_list, CH2_Terminal_list, Alcool_1_list, triple_list, 
                          Ar_COO, Ar_OSO2, CC4, Imidothioesters, anhydrides, carbamate, aniline_term, charge2, charge1, nitro_aliphatic, 
-                         ketone_aliphatic, Ar_ketone, ketone_dehydro]
+                         ketone_aliphatic, Ar_ketone, ketone_dehydro, Ar_bicycle, Al_bicycle]
     
     if mol != 'none':    
         Al_COO.append(Chem.Fragments.fr_Al_COO(mol))
@@ -228,6 +230,10 @@ def descriptor(mol: Chem.rdchem.Mol):
         # 09/09
         ketone_dehydro.append(fd.f_ketone_dehydro(mol))
         
+        #23 Nov 23
+        Ar_bicycle.append(fd.f_Ar_bicycle(mol))
+        Al_bicycle.append(fd.f_Al_bicycle(mol))
+        
     else:
         for chem_group in lst_chemical_groups:
             chem_group.append('none')
@@ -245,7 +251,7 @@ def descriptor(mol: Chem.rdchem.Mol):
                           hetero6_list, benzCH2_list, benzaldehyde_list, biphenol_list, Ar_OR_list, Ar_R_list, op_diphenolo_OR_list, Ar_COR_list, 
                           Ar_COO_R_H_list, C_3phenols_list, Ar_Cl_Br_list, Ring_3OH_3OR_list, Sulfoxide_list, CH2_Terminal_list, Alcool_1_list, 
                           triple_list,Ar_COO, Ar_OSO2, CC4, Imidothioesters, anhydrides,carbamate,aniline_term,charge2,charge1,nitro_aliphatic,
-                          ketone_aliphatic,Ar_ketone, ketone_dehydro)),
+                          ketone_aliphatic,Ar_ketone, ketone_dehydro,Ar_bicycle,Al_bicycle)),
                        
                   columns=["Al_COO","Al_OH","Al_OH_noTert","ArN","Ar_N","Ar_NH","Ar_OH","COO2","C_O",
                            "C_O_noCOO","C_S","HOCCN","Imine","NH0","NH1","NH2","N_O","Ndealkylation1",
@@ -262,5 +268,5 @@ def descriptor(mol: Chem.rdchem.Mol):
                            "benzaldehyde","biphenol", "Ar_OR", "Ar_R", "op_diphenolo_OR", "Ar_COR", "Ar_COO_R_H", "C_3phenols", 
                            "Ar_Cl_Br", "Ring_3OH_3OR", "Sulfoxide", "CH2_Terminal", "Alcool_1", "triple_bond", "Ar_COO", "Ar_OSO2", "CC4", 
                            "Imidothioesters","anhydrides","carbamate","aniline_term","charge+","charge-","nitro_aliphatic",'ketone_aliphatic',
-                           'Ar_ketone','ketone_dehydro'])
+                           'Ar_ketone','ketone_dehydro', 'Ar_bicycle','Al_bicycle'])
     return out
