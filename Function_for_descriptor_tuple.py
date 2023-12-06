@@ -181,7 +181,7 @@ def f_op_diphenolo_OR(molecule: Chem.rdchem.Mol):
 
 def f_Ar_COR(molecule: Chem.rdchem.Mol):
     '''Chetone as ring sostituen'''    
-    substructure = 'a-[CX3](=O)-[#6]~[!O,!N,!S]'
+    substructure = 'a-[CX3](=O)-[#6]-[!O,!N,!S]'
     substructure = Chem.MolFromSmarts(substructure)
     indices = molecule.GetSubstructMatches(substructure)     
     return indices
@@ -638,13 +638,6 @@ def f_Ar_ketone(molecule: Chem.rdchem.Mol):
     indices = molecule.GetSubstructMatches(substructure)       
     return indices
 
-def f_bicyclic(molecule: Chem.rdchem.Mol):
-    '''biclycle'''
-    substructure = '[R2][R2]'
-    substructure = Chem.MolFromSmarts(substructure)
-    indices = molecule.GetSubstructMatches(substructure)       
-    return indices
-
 # 9/09
 def f_ketone_dehydro(molecule: Chem.rdchem.Mol):
     '''ketone that can generate deihydro product with OH in beta e H in alpha'''
@@ -654,23 +647,3 @@ def f_ketone_dehydro(molecule: Chem.rdchem.Mol):
     return indices
 
 
-def f_methoxy(molecule: Chem.rdchem.Mol):
-    '''methoxy'''
-    substructure = '[OX2](-[#6])-[CH3]'
-    substructure = Chem.MolFromSmarts(substructure)
-    indices = molecule.GetSubstructMatches(substructure)       
-    return indices
-
-def f_Ar_bicycle(molecule: Chem.rdchem.Mol):
-    '''Aromatic biclyle'''
-    substructure = '[R2;a][R2;a]'
-    substructure = Chem.MolFromSmarts(substructure)
-    indices = molecule.GetSubstructMatches(substructure)       
-    return indices
-
-def f_Al_bicycle(molecule: Chem.rdchem.Mol):
-    '''Alifatic biclycle'''
-    substructure = '[R2;!a][R2;!a]'
-    substructure = Chem.MolFromSmarts(substructure)
-    indices = molecule.GetSubstructMatches(substructure)       
-    return indices

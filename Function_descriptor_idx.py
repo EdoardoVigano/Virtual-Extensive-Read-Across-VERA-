@@ -306,7 +306,7 @@ def f_op_diphenolo_OR(molecule: Chem.rdchem.Mol):
 
 def f_Ar_COR(molecule: Chem.rdchem.Mol):
     '''Chetone as ring sostituen'''    
-    substructure = 'a-[CX3](=O)-[#6]~[!O,!N,!S]'
+    substructure = 'a-[CX3](=O)-[#6]-[!O,!N,!S]'
     substructure = Chem.MolFromSmarts(substructure)
     hit_atss = list(molecule.GetSubstructMatches(substructure))
     hit_bondss = []
@@ -2624,40 +2624,6 @@ def f_ketone_dehydro(molecule: Chem.rdchem.Mol):
 	highlightBonds = np.array(hit_bondss).reshape(1,-1).tolist()[0]
 	return (highlightBonds, list_hit_atss)
 
-def f_Ar_bicycle(molecule: Chem.rdchem.Mol):
-	'''Aromatic bicyles'''	
-	substructure = ('[R2;a][R2;a]')
-	substructure = Chem.MolFromSmarts(substructure)
-	hit_atss = list(molecule.GetSubstructMatches(substructure))
-	hit_bondss = []
-	for hit_ats in hit_atss:
-		hit_bonds = []
-		for bond in substructure.GetBonds():
-			aid1 = hit_ats[bond.GetBeginAtomIdx()]
-			aid2 = hit_ats[bond.GetEndAtomIdx()]
-			hit_bonds.append(molecule.GetBondBetweenAtoms(aid1,aid2).GetIdx())
-			hit_bondss.append(hit_bonds)
-	list_hit_atss = np.array(hit_atss).reshape(1,-1).tolist()[0]
-	highlightBonds = np.array(hit_bondss).reshape(1,-1).tolist()[0]
-	return (highlightBonds, list_hit_atss)
-
-def f_Al_bicycle(molecule: Chem.rdchem.Mol):
-	'''Alifatic bicyles'''	
-	substructure = ('[R2;!a][R2;!a]')
-	substructure = Chem.MolFromSmarts(substructure)
-	hit_atss = list(molecule.GetSubstructMatches(substructure))
-	hit_bondss = []
-	for hit_ats in hit_atss:
-		hit_bonds = []
-		for bond in substructure.GetBonds():
-			aid1 = hit_ats[bond.GetBeginAtomIdx()]
-			aid2 = hit_ats[bond.GetEndAtomIdx()]
-			hit_bonds.append(molecule.GetBondBetweenAtoms(aid1,aid2).GetIdx())
-			hit_bondss.append(hit_bonds)
-	list_hit_atss = np.array(hit_atss).reshape(1,-1).tolist()[0]
-	highlightBonds = np.array(hit_bondss).reshape(1,-1).tolist()[0]
-	return (highlightBonds, list_hit_atss)
-
 
 
 
@@ -2729,10 +2695,6 @@ def inx_groups(mol: Chem.rdchem.Mol):
     Ar_ketone = []
 	# 09/09
     ketone_dehydro = []
-    
-    #23 Nov 23 - Ar and Al bicycle
-    Ar_bicycle = []
-    Al_bicycle = []
 
 
     lst_chemical_groups=[Al_COO,Al_OH,Al_OH_noTert,ArN,Ar_N,Ar_NH,Ar_OH,COO2,C_O,C_O_noCOO,C_S,HOCCN,Imine,NH0,NH1,NH2,N_O,
@@ -2746,7 +2708,7 @@ def inx_groups(mol: Chem.rdchem.Mol):
 						 heteroatoms_heterocycles5_list,heteroatoms_heterocycles6_list,steroid_list,hetero5_list,hetero6_list,benzCH2_list,benzaldehyde_list, 
 						 biphenol_list, Ar_OR_list, Ar_R_list, op_diphenolo_OR_list, Ar_COR_list, Ar_COO_R_H_list, C_3phenols_list, Ar_Cl_Br_list, 
 						 Ring_3OH_3OR_list, Sulfoxide_list, CH2_Terminal_list, Alcool_1_list, triple_list, Ar_COO, Ar_OSO2, CC4, Imidothioesters, 
-						 anhydrides, carbamate, aniline_term, charge2, charge1, nitro_aliphatic, ketone_aliphatic, Ar_ketone, ketone_dehydro, Ar_bicycle, Al_bicycle]
+						 anhydrides, carbamate, aniline_term, charge2, charge1, nitro_aliphatic, ketone_aliphatic, Ar_ketone, ketone_dehydro]
     
     if mol != 'none':    
         Al_COO.append(f_Al_COO(mol))
@@ -2881,9 +2843,6 @@ def inx_groups(mol: Chem.rdchem.Mol):
         Ar_ketone.append(f_Ar_ketone(mol))
         # 09/09
         ketone_dehydro.append(f_ketone_dehydro(mol))
-        #23 Nov 23
-        Ar_bicycle.append(f_Ar_bicycle(mol))
-        Al_bicycle.append(f_Al_bicycle(mol))
     else:
         for chem_group in lst_chemical_groups:
             chem_group.append('none')
@@ -2902,8 +2861,7 @@ def inx_groups(mol: Chem.rdchem.Mol):
             hetero6_list, benzCH2_list, benzaldehyde_list, biphenol_list, Ar_OR_list, Ar_R_list, op_diphenolo_OR_list,
             Ar_COR_list, Ar_COO_R_H_list, C_3phenols_list, Ar_Cl_Br_list, Ring_3OH_3OR_list, Sulfoxide_list, 
             CH2_Terminal_list, Alcool_1_list, triple_list,Ar_COO, Ar_OSO2, CC4, Imidothioesters, 
-            anhydrides,carbamate,aniline_term,charge2,charge1,nitro_aliphatic,ketone_aliphatic,Ar_ketone,ketone_dehydro,
-			Ar_bicycle,Al_bicycle]
+            anhydrides,carbamate,aniline_term,charge2,charge1,nitro_aliphatic,ketone_aliphatic,Ar_ketone,ketone_dehydro]
     
     lista2 = ["Al_COO","Al_OH","Al_OH_noTert","ArN","Ar_N","Ar_NH","Ar_OH","COO2","C_O",
             "C_O_noCOO","C_S","HOCCN","Imine","NH0","NH1","NH2","N_O","Ndealkylation1",
@@ -2921,7 +2879,7 @@ def inx_groups(mol: Chem.rdchem.Mol):
             "Ar_COO_R_H", "C_3phenols", "Ar_Cl_Br", "Ring_3OH_3OR", "Sulfoxide", "CH2_Terminal", 
             "Alcool_1", "triple_bond", "Ar_COO", "Ar_OSO2", "CC4", "Imidothioesters","anhydrides",
             "carbamate","aniline_term","charge+","charge-","nitro_aliphatic",'ketone_aliphatic',
-            'Ar_ketone','ketone_dehydro','Ar_bicycle','Al_bicycle']
+            'Ar_ketone','ketone_dehydro']
 
     out = {lista2[i]:lista1[i] for i in range(len(lista1))}
     return out

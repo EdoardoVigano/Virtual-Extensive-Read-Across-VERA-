@@ -1,11 +1,5 @@
 
 from rdkit import Chem
-''' Every time you have to update this update also:
-    Function_for_descriptor_idx.py
-    Function_for_descriptor_tuple.py
-    Function_for_descriptor.py
-   '''
-
 
 def f_steroid(molecule: Chem.rdchem.Mol):
     ''' steroid scaffold
@@ -163,7 +157,7 @@ def f_op_diphenolo_OR(molecule: Chem.rdchem.Mol):
 
 def f_Ar_COR(molecule: Chem.rdchem.Mol):
     '''Chetone as ring sostituen'''    
-    substructure = 'a-[CX3](=O)-[#6]~[!O,!N,!S]'
+    substructure = 'a-[CX3](=O)-[#6]-[!O,!N,!S]'
     substructure = Chem.MolFromSmarts(substructure)
     indices = molecule.GetSubstructMatches(substructure)     
     return len(indices)
@@ -459,20 +453,6 @@ def f_Ar_ketone(molecule: Chem.rdchem.Mol):
 def f_ketone_dehydro(molecule: Chem.rdchem.Mol):
     '''ketone that can generate deihydro product with OH in beta e H in alpha'''
     substructure = '[C]-[C](=O)-[Ch1]-[C](-[Oh1])'
-    substructure = Chem.MolFromSmarts(substructure)
-    indices = molecule.GetSubstructMatches(substructure)       
-    return len(indices)
-
-def f_Ar_bicycle(molecule: Chem.rdchem.Mol):
-    '''Aromatic biclyle'''
-    substructure = '[R2;a][R2;a]'
-    substructure = Chem.MolFromSmarts(substructure)
-    indices = molecule.GetSubstructMatches(substructure)       
-    return len(indices)
-
-def f_Al_bicycle(molecule: Chem.rdchem.Mol):
-    '''Alifatic biclycle'''
-    substructure = '[R2;!a][R2;!a]'
     substructure = Chem.MolFromSmarts(substructure)
     indices = molecule.GetSubstructMatches(substructure)       
     return len(indices)
